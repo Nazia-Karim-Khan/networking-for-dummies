@@ -3,7 +3,7 @@
 :heading: 2
 :END:
 Meena and Raju have got new computers to play around. They played a lot of solo mission based based games. Their favorite game is Call of Duty MW3. They have finished all the campaign and now looking forward to the special ops challenges. They have successfully completed the first five special ops missions but the sixth one is *Firewall* a *co-op* mission.
-[[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg][Call of Duty Modern Warfare 3 | Intro & Main Menu + Theme Song! (PS3 1080p)  - YouTube]]{:height 710, :width 1248}
+[[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg][Call of Duty Modern Warfare 3]]{:height 710, :width 1248}
 
 Let's took at Meena and Raju's room
 [[../assets/image_1695215839229_0.png]] 
@@ -17,13 +17,13 @@ Network is a group of interconnected computers sharing resources.
 Here we need a network to share Meena and Raju's location, actions and the overall world state within the game.
 
 For creating a network:
-** Firstly we need nodes(computers) that follows the `same language`(protocol) when sharing data between them.
-** We need to connect the computers
+ - Firstly we need nodes(computers) that follows the `same language`(protocol) when sharing data between them.
+ - We need to connect the computers
 * Simulating Nodes
 :PROPERTIES:
 :heading: 2
 :END:
-** We will be used docker containers to simulate nodes.
+We will be used docker containers to simulate nodes.
 #+BEGIN_SRC Dockerfile
 # nfd-node.dockerfile
 FROM fedora:latest
@@ -43,7 +43,8 @@ docker build --tag nfd-node --file nfd-node.dockerfile .
 :PROPERTIES:
 :heading: 2
 :END:
-In this phase, we are going to connect the nodes directly with ethernet cable and interfaces. Of course, we dont have any cables within the virtual space, so we have to use virtual ethernet cables and interfaces. Each of the interface will get its own device address(mac address) and a network address(ip address) to talk to other computers on the network.
+In this phase, we are going to connect the nodes directly with ethernet cable and interfaces. Of course, we dont have any cables within the virtual space, so we have to use virtual ethernet cables and interfaces.
+Each of the interface will get its own device address(mac address) and a network address(ip address) to talk to other computers on the network.
 * What is a network interface?
 :PROPERTIES:
 :heading: 2
