@@ -24,7 +24,7 @@ For creating a network:
 :heading: 2
 :END:
 ** We will be used docker containers to simulate nodes.
-```Dockerfile
+#+BEGIN_SRC Dockerfile
 # nfd-node.dockerfile
 FROM fedora:latest
 
@@ -33,27 +33,12 @@ RUN dnf update -y
 RUN dnf install -y tcpdump iproute iputils bind-utils net-tools iptables
 
 ENTRYPOINT sleep infinity
-```
+#+END_SRC
+
 To build the image,
-```bash
+#+BEGIN_SRC bash
 docker build --tag nfd-node --file nfd-node.dockerfile .
-```
-** Running the nodes
-```bash
-# create-nodes.sh
-# create Meena and Raju's Computers
-docker run -d --rm --name nfd-node-meena --network none --privileged --hostname nfd-node-meena nfd-node:latest
-docker run -d --rm --name nfd-node-raju --network none --privileged --hostname nfd-node-raju nfd-node:latest
-```
-** Getting access into the nodes
-```bash
-docker exec -it nfd-node-meena bash
-docker exec -it nfd-node-raju bash
-```
-I have used tmux to put all the screens together. (God! I can't survive without i3)
-At the end it will look something like this
-[[../assets/image_1695216262678_0.png]]
-**
+#+END_SRC
 * Connecting the computers (phase-1)
 :PROPERTIES:
 :heading: 2
