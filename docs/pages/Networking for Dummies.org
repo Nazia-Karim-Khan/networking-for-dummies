@@ -1,0 +1,68 @@
+* The Problem
+:PROPERTIES:
+:heading: 2
+:END:
+Meena and Raju have got new computers to play around. They played a lot of solo mission based based games. Their favorite game is Call of Duty MW3. They have finished all the campaign and now looking forward to the special ops challenges. They have successfully completed the first five special ops missions but the sixth one is *Firewall* a *co-op* mission.
+[[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg][Call of Duty Modern Warfare 3 | Intro & Main Menu + Theme Song! (PS3 1080p)  - YouTube]]{:height 710, :width 1248}
+
+Let's took at Meena and Raju's room
+[[../assets/image_1695215839229_0.png]] 
+
+Now they have to find a way to connect the two computers together and finish the *coop mission*. How will they do it?
+* We need a network!
+:PROPERTIES:
+:heading: 2
+:END:
+Network is a group of interconnected computers sharing resources.
+Here we need a network to share Meena and Raju's location, actions and the overall world state within the game.
+
+For creating a network:
+** Firstly we need nodes(computers) that follows the `same language`(protocol) when sharing data between them.
+** We need to connect the computers
+* Simulating Nodes
+:PROPERTIES:
+:heading: 2
+:END:
+** We will be used docker containers to simulate nodes.
+```Dockerfile
+# nfd-node.dockerfile
+FROM fedora:latest
+
+RUN dnf update -y
+
+RUN dnf install -y tcpdump iproute iputils bind-utils net-tools iptables
+
+ENTRYPOINT sleep infinity
+```
+To build the image,
+```bash
+docker build --tag nfd-node --file nfd-node.dockerfile .
+```
+** Running the nodes
+```bash
+# create-nodes.sh
+# create Meena and Raju's Computers
+docker run -d --rm --name nfd-node-meena --network none --privileged --hostname nfd-node-meena nfd-node:latest
+docker run -d --rm --name nfd-node-raju --network none --privileged --hostname nfd-node-raju nfd-node:latest
+```
+** Getting access into the nodes
+```bash
+docker exec -it nfd-node-meena bash
+docker exec -it nfd-node-raju bash
+```
+I have used tmux to put all the screens together. (God! I can't survive without i3)
+At the end it will look something like this
+[[../assets/image_1695216262678_0.png]]
+**
+* Connecting the computers (phase-1)
+:PROPERTIES:
+:heading: 2
+:END:
+In this phase, we are going to connect the nodes directly with ethernet cable and interfaces. Of course, we dont have any cables within the virtual space, so we have to use virtual ethernet cables and interfaces. Each of the interface will get its own device address(mac address) and a network address(ip address) to talk to other computers on the network.
+* What is a network interface?
+:PROPERTIES:
+:heading: 2
+:END:
+It is usually a hardware component that is used to connect the computer. It is the junction point.
+There are various kinds of
+*
