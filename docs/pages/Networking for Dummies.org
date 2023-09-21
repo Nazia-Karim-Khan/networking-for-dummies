@@ -3,10 +3,10 @@
 :heading: 2
 :END:
 Meena and Raju have got new computers to play around. They played a lot of solo mission based based games. Their favorite game is Call of Duty MW3. They have finished all the campaign and now looking forward to the special ops challenges. They have successfully completed the first five special ops missions but the sixth one is *Firewall* a *co-op* mission.
-[[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg][Call of Duty Modern Warfare 3]]{:height 710, :width 1248}
+[[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg]]
 
 Let's took at Meena and Raju's room
-[[../assets/image_1695215839229_0.png]] 
+[[../assets/image_1695215839229_0.png]]
 
 Now they have to find a way to connect the two computers together and finish the *coop mission*. How will they do it?
 * We need a network!
