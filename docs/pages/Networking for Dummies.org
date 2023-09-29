@@ -39,16 +39,108 @@ To build the image,
 #+BEGIN_SRC bash
 docker build --tag nfd-node --file nfd-node.dockerfile .
 #+END_SRC
+* Creating the nodes
+:PROPERTIES:
+:heading: 2
+:END:
+We will create the nodes by running two docker containers of the ~nfd-node~ image
+#+BEGIN_SRC sh
+docker run -d --rm --name nfd-node-meena --network none --privileged --hostname nfd-node-meena nfd-node:latest
+docker run -d --rm --name nfd-node-raju --network none --privileged --hostname nfd-node-raju nfd-node:latest
+#+END_SRC
+* Accessing the nodes
+:PROPERTIES:
+:heading: 2
+:END:
+I am using tmux for accessing all the nodes in a single screen. (I have not setup wm yet 😔).
+For getting into the nodes execute the following commands in different terminals.
+#+BEGIN_SRC sh
+docker exec -it nfd-node-meena bash
+docker exec -it nfd-node-raju bash
+#+END_SRC
+After that you will have access to nodes. And it will look something like the following
+[[../assets/image_1695912258299_0.png]]
 * Connecting the computers (phase-1)
 :PROPERTIES:
 :heading: 2
 :END:
 In this phase, we are going to connect the nodes directly with ethernet cable and interfaces. Of course, we dont have any cables within the virtual space, so we have to use virtual ethernet cables and interfaces.
+
 Each of the interface will get its own device address(mac address) and a network address(ip address) to talk to other computers on the network.
 * What is a network interface?
 :PROPERTIES:
 :heading: 2
 :END:
-It is usually a hardware component that is used to connect the computer. It is the junction point.
-There are various kinds of
-*
+It is usually a hardware component that is used to connect the computer. It is the peripheral device that acts as a junction point. Network interfaces are generally physical devices, but doesn't have to be; it can also be a software simulating the network device. And that's what we will be using today to simulate our network.
+The first device we will use to simulate the connection between two nodes are virtual ethernet devices (veth)
+* Network Interfaces:
+:PROPERTIES:
+:heading: 2
+:END:
+** LOOPBACK
+By default all nodes have loopback interfaces installed on them by default. If we execute the ~ip addr~ command on meena and raju's computer we will see, that they have only loopback interfaces.
+
+[[../assets/image_1695915428748_0.png]] 
+
+The loopback interface, which is a virtual interface used for internal communication within the same device. It has IPV4 address of ~127.0.0.1~ which is local only to host (localhost), and its MAC address is typically set to all zeros.
+** VETH
+Veth acts as tunnel through which devices on one network can talk to devices on another network. Veth devices are always created in interconnected pairs. Packets transmitted on one device in the pair are immediately received on the other device. A pair can be created using the command:
+#+BEGIN_SRC sh
+ip link add <p1-name> type veth peer name <p2-name>
+#+END_SRC
+In the above, p1-name and p2-name are the names assigned to the two connected end points.
+* Connecting the computers...continued
+:PROPERTIES:
+:heading: 2
+:END:
+And now we will try to create a pair of veth devices that connects meena and raju's computers together.
+[[../assets/image_1695913755287_0.png]]
+
+#+BEGIN_SRC sh
+sudo ip link add veth-meena type veth peer name veth-raju
+ip addr | grep veth -A1
+#+END_SRC
+
+After running this command we will have a pair of virtual ethernet devices in our own machine. Now the state looks something like this.
+[[../assets/image_1695914059672_0.png]]
+
+Notice that the newly created veth interfaces have unique MAC addresses associated associated with them. MAC addresses are unique identifiers assigned to network devices. They still don't have any IP address associated with them.
+
+Now let's associate the interfaces to the nodes.
+#+BEGIN_SRC sh
+sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-node-meena) dev veth-meena
+sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-node-raju) dev veth-raju
+#+END_SRC
+
+I promise I will explain what these complex commands do when its time. For now just hang with me.
+
+Roughly speaking we set the veth-meena interface to nfd-node-meena and vice versa. Now lets see the interfaces in the nodes.
+[[../assets/image_1695917713076_0.png]]
+
+Notice that meena's computer have now interface named veth-meena and the same for raju.
+
+Upto now, the interfaces only have device addresses. Which means they are layer 2 interfaces.
+* Network Layers
+:PROPERTIES:
+:heading: 2
+:END:
+Let's look into the layers that makes up the network.
+[[https://media.fs.com/images/community/upload/kindEditor/202107/29/original-seven-layers-of-osi-model-1627523878-JYjV8oybcC.png][TCP/IP vs. OSI: What's the Difference Between them? | FS Community]]
+
+The first layer is the physical layer and we don't see it in our network, because, well its virtual network, we don't need physical wires to connect them. When we created the veth pairs the physical and data link layers are taken as granted by default and we didn't have to worry about them. What we do need to worry about is layer 3, the network layer.
+In this layer we need logical addresses for the devices, for if we want them to communicate. These addresses are called IP addresses.
+And now we will assign IP addresses to our virtual network interfaces. Before assigning IP addresses, lets talk a little bit more about IP addresses.
+* Network (IP) Address
+:PROPERTIES:
+:heading: 2
+:END:
+Every IP address has two parts, the first part is same and the second part is unique for all the devices in the network. Let's look at how we can identify these two parts.
+The first part is also called the network address. As obvious it is, the network address for all the devices in the same network is same.
+
+Let's take a look at an IP address example ~192.168.0.5/24~
+
+Here the
+* #+BEGIN_SRC shell
+#+END_SRC
+After that it will look something like this.
+[[../assets/image_1695918847119_0.png]]
