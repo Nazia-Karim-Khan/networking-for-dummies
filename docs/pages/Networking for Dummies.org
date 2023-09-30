@@ -78,12 +78,18 @@ The first device we will use to simulate the connection between two nodes are vi
 :heading: 2
 :END:
 ** LOOPBACK
+:PROPERTIES:
+:heading: 3
+:END:
 By default all nodes have loopback interfaces installed on them by default. If we execute the ~ip addr~ command on meena and raju's computer we will see, that they have only loopback interfaces.
 
 [[../assets/image_1695915428748_0.png]] 
 
 The loopback interface, which is a virtual interface used for internal communication within the same device. It has IPV4 address of ~127.0.0.1~ which is local only to host (localhost), and its MAC address is typically set to all zeros.
 ** VETH
+:PROPERTIES:
+:heading: 3
+:END:
 Veth acts as tunnel through which devices on one network can talk to devices on another network. Veth devices are always created in interconnected pairs. Packets transmitted on one device in the pair are immediately received on the other device. A pair can be created using the command:
 #+BEGIN_SRC sh
 ip link add <p1-name> type veth peer name <p2-name>
@@ -138,9 +144,80 @@ Every IP address has two parts, the first part is same and the second part is un
 The first part is also called the network address. As obvious it is, the network address for all the devices in the same network is same.
 
 Let's take a look at an IP address example ~192.168.0.5/24~
+Here the ip address is comprised of 4 segments of 8 bits.
+~00000000.00000000.00000000.00000000~
+So the lowest value is ~0.0.0.0~ and the highest value is ~255.255.255.255~
+And the /X part identifies the network address also known as network mask. Here 24 means first 24 bits will be taken as network address and the remaining bits will be allocated to the devices.
+So in this network, ~192.168.0~ is the network part, and the last 8 bits are allocated to devices. So that means the network has addresses from ~192.168.0.0~ to ~192.168.0.255~. This means this network can have 256 devices connected to each other.
+But there is a catch, there are two special reserved addresses for a network, the first and the last one. The first one is called network address and the last one is called broadcast address.
+So, here the addresses ~192.168.0.0~ is the network address and ~192.168.0.255~ is the broadcast address. Broadcast address is a little bit special in the sense that, any message sent to the broadcast address will be delivered to all of the devices in the network. And thus, we have 254 unique addresses in the network ~192.168.0.0/24~.
 
-Here the
-* #+BEGIN_SRC shell
+Now let's do a little exercise, if the network address is ~192.168.0.0/18~, what will be the broadcast address of the network? How many devices can this network contain?
+Let's convert the address in bits.
+~11000000.10101000.00000000.00000000~
+Here the first 18 bits are untouchable, since it's the network address, and its same for everybody. The two separated parts are:
+~11000000.10101000.00~ ~000000.00000000~
+So here the network mask is:
+~11111111.11111111.11~ ~000000.00000000~ or ~255.255.192.0~
+And the highest address will be:
+~11000000.10101000.00~ ~111111.11111111~
+So the network address is ~192.168.0.0/18~ and the broadcast address is ~192.168.63.255/18~
+And the network can contain ~2^14 = 16384 - 2 = 16382~ devices.
+
+Following this procedure, we can break a large network into smaller networks, which is called subnetting.
+* Connecting the computers...continued...
+:PROPERTIES:
+:heading: 2
+:END:
+Let's create a new network with address 10.2.3.0/24.
+Note that this network doesn't overlap with any other networks in my machine.
+[[../assets/Screenshot_from_2023-09-28_22-44-18_1696043036103_0.png]]
+
+Now we will assign IP address 10.2.3.2 to meena and 10.2.3.3 to raju.
+#+BEGIN_SRC shell
+ip addr add 10.2.3.2/24 dev veth-meena
+ip addr add 10.2.3.3/24 dev veth-raju
 #+END_SRC
 After that it will look something like this.
 [[../assets/image_1695918847119_0.png]]
+
+Note that the state is still down.
+[[../assets/Screenshot_from_2023-09-30_09-09-07-mh_1696043574852_0.png]]
+
+We need to turn them UP.
+#+BEGIN_SRC shell
+sudo ip link set dev veth-meena up
+sudo ip link set dev veth-raju up
+#+END_SRC
+And then we can communicate with the computers in the network.
+#+BEGIN_SRC shell
+ping -c 10.2.3.3
+ping -c 10.2.3.2
+#+END_SRC
+[[../assets/image_1696043882398_0.png]]
+
+And with that we are done with phase 1. We have successfully connected two computers with a virtual ethernet pair and established network within themselves.
+Now meena and raju can complete the ~coop~ missions in Call of Duty.
+* Network Protocols
+:PROPERTIES:
+:heading: 2
+:END:
+We haven't talked about the ping command and what it does, lets learn a little bit about the language of the communication, i.e. the protocols of the network.
+** ICMP
+:PROPERTIES:
+:heading: 3
+:END:
+The Internet Control Message Protocol (ICMP) is a network layer protocol used by network devices to diagnose network communication issues. ICMP is mainly used to determine whether or not data is reaching its intended destination in a timely manner.
+
+Here we used the ping command to send an ICMP message to the other computer in the network and if everythingis OK, then they reply with a response and the communication between the two computers is established successfully.
+We will talk about other network protocols as we progress on.
+* Connecting the computers (phase-2)
+:PROPERTIES:
+:heading: 2
+:END:
+It's going all well, but recently meetu has been gifted a new laptop on his birthday and now, he also wants to play along with them.
+[[../assets/image_1696061356581_0.png]]
+How do we connect all of their computers in the same network?
+
+
+*

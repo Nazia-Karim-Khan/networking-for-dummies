@@ -1,2 +1,0 @@
-docker run -d --rm --name nfd-node-meena --network none --privileged --hostname nfd-node-meena nfd-node:latest
-docker run -d --rm --name nfd-node-raju --network none --privileged --hostname nfd-node-raju nfd-node:latest
