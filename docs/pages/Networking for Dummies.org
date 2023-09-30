@@ -219,5 +219,12 @@ It's going all well, but recently meetu has been gifted a new laptop on his birt
 [[../assets/image_1696061356581_0.png]]
 How do we connect all of their computers in the same network?
 
+One solution would be connecting all of the computers with each other. Although it is a solution, it's a bad one.
+The solution doesn't scale if we need to add more computers. Lot's of connections makes it harder to maintain and debug.
+The better solution is to bring in a *Router*
 
+If we want to mentally visualize, the network will look something like below:
+[[../assets/image_1696063049616_0.png]]
+
+Here the number of connections scale linearly as the no of devices grow.
 *
