@@ -191,8 +191,8 @@ sudo ip link set dev veth-raju up
 #+END_SRC
 And then we can communicate with the computers in the network.
 #+BEGIN_SRC shell
-ping -c 10.2.3.3
-ping -c 10.2.3.2
+ping -c 2 10.2.3.3
+ping -c 2 10.2.3.2
 #+END_SRC
 [[../assets/image_1696043882398_0.png]]
 
