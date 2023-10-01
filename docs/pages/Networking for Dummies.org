@@ -1,3 +1,5 @@
+N.B: I tried to simulate the network only with docker containers, so that people working on Windows and Mac can follow, but unknowingly I used the namespace features, which is only available on linux.
+
 * The Problem
 :PROPERTIES:
 :heading: 2
@@ -131,7 +133,7 @@ Upto now, the interfaces only have device addresses. Which means they are layer 
 :heading: 2
 :END:
 Let's look into the layers that makes up the network.
-[[https://media.fs.com/images/community/upload/kindEditor/202107/29/original-seven-layers-of-osi-model-1627523878-JYjV8oybcC.png][TCP/IP vs. OSI: What's the Difference Between them? | FS Community]]
+[[https://media.fs.com/images/community/upload/kindEditor/202107/29/original-seven-layers-of-osi-model-1627523878-JYjV8oybcC.png]]
 
 The first layer is the physical layer and we don't see it in our network, because, well its virtual network, we don't need physical wires to connect them. When we created the veth pairs the physical and data link layers are taken as granted by default and we didn't have to worry about them. What we do need to worry about is layer 3, the network layer.
 In this layer we need logical addresses for the devices, for if we want them to communicate. These addresses are called IP addresses.
@@ -227,4 +229,24 @@ If we want to mentally visualize, the network will look something like below:
 [[../assets/image_1696097354631_0.png]] 
 
 Here the number of connections scale linearly as the no of devices grow.
+
+Now we will create an additional node to emulate meetu's computer.
+#+BEGIN_SRC shell
+docker run -d --rm --name nfd-node-meetu --network none --privileged --hostname nfd-node-meetu nfd-node:latest
+#+END_SRC
+
+Then we will delete the old veth interface pair on meena and raju's computer.
+#+BEGIN_SRC shell
+ip link delete veth-meena
+#+END_SRC
+
+If we delete one of the interface, the other one will be automatically deleted.
+[[../assets/image_1696185719575_0.png]]
+
+Now we will create a virtual interface of type *bridge* that will actually act as a router for our network.
+Then we will delete the old veth interface pair on meena and raju's computer.
+#+BEGIN_SRC shell
+ip link
+#+END_SRC
+
 *
