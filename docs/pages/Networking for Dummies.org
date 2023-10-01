@@ -233,6 +233,7 @@ Here the number of connections scale linearly as the no of devices grow.
 Now we will create an additional node to emulate meetu's computer.
 #+BEGIN_SRC shell
 docker run -d --rm --name nfd-node-meetu --network none --privileged --hostname nfd-node-meetu nfd-node:latest
+docker exec -it nfd-node-meetu bash
 #+END_SRC
 
 Then we will delete the old veth interface pair on meena and raju's computer.
@@ -244,9 +245,61 @@ If we delete one of the interface, the other one will be automatically deleted.
 [[../assets/image_1696185719575_0.png]]
 
 Now we will create a virtual interface of type *bridge* that will actually act as a router for our network.
-Then we will delete the old veth interface pair on meena and raju's computer.
 #+BEGIN_SRC shell
-ip link
+sudo ip link add nfd-rtr type bridge
+ip addr | grep nfd-rtr -A1
+#+END_SRC
+[[../assets/image_1696186776785_0.png]]
+
+Now we will create the veth pairs for the connections.
+#+BEGIN_SRC shell
+sudo ip link add veth-meena-rtr type veth peer name veth-rtr-meena
+sudo ip link add veth-raju-rtr type veth peer name veth-rtr-raju
+sudo ip link add veth-meetu-rtr type veth peer name veth-rtr-meetu
+ip addr | grep veth -A1
 #+END_SRC
 
+[[../assets/image_1696187040059_0.png]]
+
+Now we will associate the interfaces to the machines like before.
+#+BEGIN_SRC shell
+sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-node-meena) dev veth-meena-rtr
+sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-node-raju) dev veth-raju-rtr
+sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-node-meetu) dev veth-meetu-rtr
+#+END_SRC
+
+And assign ip addresses to the interfaces.
+
+#+BEGIN_SRC shell
+sudo ip addr add 10.2.3.2/24 dev veth-meena-rtr
+sudo ip addr add 10.2.3.3/24 dev veth-raju-rtr
+sudo ip addr add 10.2.3.4/24 dev veth-meetu-rtr
+#+END_SRC
+
+And now, if we see the interfaces, it will look something like below.
+[[../assets/image_1696188956498_0.png]]
+
+After that we need to connect the other end of the veth pair with the router.
+#+BEGIN_SRC shell
+sudo ip link set veth-rtr-meena master nfd-rtr
+sudo ip link set veth-rtr-raju master nfd-rtr
+sudo ip link set veth-rtr-meetu master nfd-rtr
+brctl show nfd-rtr
+#+END_SRC
+
+[[../assets/image_1696190483136_0.png]]
+
+Now it's time to bring up all the connections.
+#+BEGIN_SRC shell
+sudo ip link set nfd-rtr up
+sudo ip link set veth-rtr-meena up
+sudo ip link set veth-rtr-raju up
+sudo ip link set veth-rtr-meetu up
+
+ip link set veth-meena-rtr up
+ip link set veth-raju-rtr up
+ip link set veth-meetu-rtr up
+#+END_SRC
+
+[[../assets/image_1696190922391_0.png]]
 *
