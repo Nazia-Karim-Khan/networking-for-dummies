@@ -224,7 +224,7 @@ The solution doesn't scale if we need to add more computers. Lot's of connection
 The better solution is to bring in a *Router*
 
 If we want to mentally visualize, the network will look something like below:
-[[../assets/image_1696063049616_0.png]]
+[[../assets/image_1696097354631_0.png]] 
 
 Here the number of connections scale linearly as the no of devices grow.
 *
