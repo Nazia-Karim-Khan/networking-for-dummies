@@ -302,4 +302,35 @@ ip link set veth-meetu-rtr up
 #+END_SRC
 
 [[../assets/image_1696190922391_0.png]]
+
+Now if we ping the other devices in the network,
+[[../assets/image_1696226945994_0.png]]
+
+We can see, from the host machine(upper left hand corner), we can ping all four of the devices.
+But on the other machines, we can only ping the router and the machine itself.
+Now there are two questions:
+- How is the host machine communicating with all the devices in different network?
+- The other machines can't communicate with each other. But the router is supposed to forward the packets to the destined ip addresses, why isn't it doing so?
+
+In this phase, we will learn about debugging network communications. Stay hydrated, it's gonna be a walk through the Sahara.
+
+Firstly we will run a tcpdump command on meena's machine and get all the information we want.
+
+
+The following `tcpdump` command captures network traffic on the specified network interface (`veth-meena-rtr`) and filters it to display packets involving the host with the IP address 10.2.3.3. Here's a breakdown of the command and what it does:
+
+- `tcpdump`: This is the command used for packet capture and analysis.
+
+- `-n`: The `-n` option prevents `tcpdump` from performing hostname resolution, so it displays IP addresses and port numbers instead of resolving them to hostnames and service names.
+
+- `-vvv`: The `-vvv` option increases the verbosity level, providing more detailed information about each captured packet. In this case, it's set to a high verbosity level, which means you'll get extensive packet details.
+
+- `-e`: The `-e` option instructs `tcpdump` to display the link-level header (Ethernet frame header) information, including source and destination MAC addresses.
+
+- `-i veth-meena-rtr`: The `-i` option specifies the network interface (`veth-meena-rtr`) on which `tcpdump` should capture packets.
+
+- `host 10.2.3.3`: This filter specifies that you want to capture packets where the source or destination IP address is 10.2.3.3. This filter helps you focus on traffic involving this specific IP address.
+
+When you run this command, `tcpdump` will capture network packets on the `veth-meena-rtr` interface and display detailed information for each packet that matches the specified filter (packets involving the IP address 10.2.3.3). The output will include source and destination IP addresses, source and destination MAC addresses, and other packet details. This is useful for monitoring or troubleshooting network traffic to or from the specified host.
+
 *
