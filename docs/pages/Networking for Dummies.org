@@ -2,7 +2,7 @@ N.B: I tried to simulate the network only with docker containers, so that people
 
 * The Problem
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 Meena and Raju have got new computers to play around. They played a lot of solo mission based based games. Their favorite game is Call of Duty MW3. They have finished all the campaign and now looking forward to the special ops challenges. They have successfully completed the first five special ops missions but the sixth one is *Firewall* a *co-op* mission.
 [[https://i.ytimg.com/vi/ATwQ64qLN2g/maxresdefault.jpg]]
@@ -13,7 +13,7 @@ Let's took at Meena and Raju's room
 Now they have to find a way to connect the two computers together and finish the *coop mission*. How will they do it?
 * We need a network!
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 Network is a group of interconnected computers sharing resources.
 Here we need a network to share Meena and Raju's location, actions and the overall world state within the game.
@@ -23,7 +23,7 @@ For creating a network:
  - We need to connect the computers
 * Simulating Nodes
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 We will be used docker containers to simulate nodes.
 #+BEGIN_SRC Dockerfile
@@ -43,7 +43,7 @@ docker build --tag nfd-node --file nfd-node.dockerfile .
 #+END_SRC
 * Creating the nodes
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 We will create the nodes by running two docker containers of the ~nfd-node~ image
 #+BEGIN_SRC sh
@@ -52,7 +52,7 @@ docker run -d --rm --name nfd-node-raju --network none --privileged --hostname n
 #+END_SRC
 * Accessing the nodes
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 I am using tmux for accessing all the nodes in a single screen. (I have not setup wm yet 😔).
 For getting into the nodes execute the following commands in different terminals.
@@ -62,7 +62,7 @@ docker exec -it nfd-node-raju bash
 #+END_SRC
 After that you will have access to nodes. And it will look something like the following
 [[../assets/image_1695912258299_0.png]]
-* Connecting the computers (phase-1)
+* Connecting the computers (phase0)
 :PROPERTIES:
 :heading: 2
 :END:
@@ -71,17 +71,17 @@ In this phase, we are going to connect the nodes directly with ethernet cable an
 Each of the interface will get its own device address(mac address) and a network address(ip address) to talk to other computers on the network.
 * What is a network interface?
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 It is usually a hardware component that is used to connect the computer. It is the peripheral device that acts as a junction point. Network interfaces are generally physical devices, but doesn't have to be; it can also be a software simulating the network device. And that's what we will be using today to simulate our network.
 The first device we will use to simulate the connection between two nodes are virtual ethernet devices (veth)
 * Network Interfaces:
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 ** LOOPBACK
 :PROPERTIES:
-:heading: 3
+:heading: 4
 :END:
 By default all nodes have loopback interfaces installed on them by default. If we execute the ~ip addr~ command on meena and raju's computer we will see, that they have only loopback interfaces.
 
@@ -90,7 +90,7 @@ By default all nodes have loopback interfaces installed on them by default. If w
 The loopback interface, which is a virtual interface used for internal communication within the same device. It has IPV4 address of ~127.0.0.1~ which is local only to host (localhost), and its MAC address is typically set to all zeros.
 ** VETH
 :PROPERTIES:
-:heading: 3
+:heading: 4
 :END:
 Veth acts as tunnel through which devices on one network can talk to devices on another network. Veth devices are always created in interconnected pairs. Packets transmitted on one device in the pair are immediately received on the other device. A pair can be created using the command:
 #+BEGIN_SRC sh
@@ -99,7 +99,7 @@ ip link add <p1-name> type veth peer name <p2-name>
 In the above, p1-name and p2-name are the names assigned to the two connected end points.
 * Connecting the computers...continued
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 And now we will try to create a pair of veth devices that connects meena and raju's computers together.
 [[../assets/image_1695913755287_0.png]]
@@ -130,7 +130,7 @@ Notice that meena's computer have now interface named veth-meena and the same fo
 Upto now, the interfaces only have device addresses. Which means they are layer 2 interfaces.
 * Network Layers
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 Let's look into the layers that makes up the network.
 [[https://media.fs.com/images/community/upload/kindEditor/202107/29/original-seven-layers-of-osi-model-1627523878-JYjV8oybcC.png]]
@@ -140,7 +140,7 @@ In this layer we need logical addresses for the devices, for if we want them to 
 And now we will assign IP addresses to our virtual network interfaces. Before assigning IP addresses, lets talk a little bit more about IP addresses.
 * Network (IP) Address
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 Every IP address has two parts, the first part is same and the second part is unique for all the devices in the network. Let's look at how we can identify these two parts.
 The first part is also called the network address. As obvious it is, the network address for all the devices in the same network is same.
@@ -169,7 +169,7 @@ And the network can contain ~2^14 = 16384 - 2 = 16382~ devices.
 Following this procedure, we can break a large network into smaller networks, which is called subnetting.
 * Connecting the computers...continued...
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 Let's create a new network with address 10.2.3.0/24.
 Note that this network doesn't overlap with any other networks in my machine.
@@ -202,18 +202,18 @@ And with that we are done with phase 1. We have successfully connected two compu
 Now meena and raju can complete the ~coop~ missions in Call of Duty.
 * Network Protocols
 :PROPERTIES:
-:heading: 2
+:heading: 3
 :END:
 We haven't talked about the ping command and what it does, lets learn a little bit about the language of the communication, i.e. the protocols of the network.
 ** ICMP
 :PROPERTIES:
-:heading: 3
+:heading: 4
 :END:
 The Internet Control Message Protocol (ICMP) is a network layer protocol used by network devices to diagnose network communication issues. ICMP is mainly used to determine whether or not data is reaching its intended destination in a timely manner.
 
 Here we used the ping command to send an ICMP message to the other computer in the network and if everythingis OK, then they reply with a response and the communication between the two computers is established successfully.
 We will talk about other network protocols as we progress on.
-* Connecting the computers (phase-2)
+* Connecting the computers (phase-1)
 :PROPERTIES:
 :heading: 2
 :END:
@@ -313,24 +313,89 @@ Now there are two questions:
 - The other machines can't communicate with each other. But the router is supposed to forward the packets to the destined ip addresses, why isn't it doing so?
 
 In this phase, we will learn about debugging network communications. Stay hydrated, it's gonna be a walk through the Sahara.
+* TCPDUMP
+:PROPERTIES:
+:heading: 3
+:END:
 
 Firstly we will run a tcpdump command on meena's machine and get all the information we want.
+#+BEGIN_SRC shell
+tcpdump -n -vvv -e -i veth-meena-rtr host 10.2.3.3
+#+END_SRC
 
+The following *tcpdump* command captures network traffic on the specified network interface (*veth-meena-rtr*) and filters it to display packets involving the host with the IP address 10.2.3.3. Here's a breakdown of the command and what it does:
 
-The following `tcpdump` command captures network traffic on the specified network interface (`veth-meena-rtr`) and filters it to display packets involving the host with the IP address 10.2.3.3. Here's a breakdown of the command and what it does:
+- *tcpdump*: This is the command used for packet capture and analysis.
 
-- `tcpdump`: This is the command used for packet capture and analysis.
+- *-n*: The *-n* option prevents *tcpdump* from performing hostname resolution, so it displays IP addresses and port numbers instead of resolving them to hostnames and service names.
 
-- `-n`: The `-n` option prevents `tcpdump` from performing hostname resolution, so it displays IP addresses and port numbers instead of resolving them to hostnames and service names.
+- *-vvv*: The *-vvv* option increases the verbosity level, providing more detailed information about each captured packet. In this case, it's set to a high verbosity level, which means you'll get extensive packet details.
 
-- `-vvv`: The `-vvv` option increases the verbosity level, providing more detailed information about each captured packet. In this case, it's set to a high verbosity level, which means you'll get extensive packet details.
+- *-e*: The *-e* option instructs *tcpdump* to display the link-level header (Ethernet frame header) information, including source and destination MAC addresses.
 
-- `-e`: The `-e` option instructs `tcpdump` to display the link-level header (Ethernet frame header) information, including source and destination MAC addresses.
+- *-i veth-meena-rtr*: The *-i* option specifies the network interface (*veth-meena-rtr*) on which *tcpdump* should capture packets.
 
-- `-i veth-meena-rtr`: The `-i` option specifies the network interface (`veth-meena-rtr`) on which `tcpdump` should capture packets.
+- *host 10.2.3.3*: This filter specifies that you want to capture packets where the source or destination IP address is 10.2.3.3. This filter helps you focus on traffic involving this specific IP address.
 
-- `host 10.2.3.3`: This filter specifies that you want to capture packets where the source or destination IP address is 10.2.3.3. This filter helps you focus on traffic involving this specific IP address.
+When you run this command, *tcpdump* will capture network packets on the *veth-meena-rtr* interface and display detailed information for each packet that matches the specified filter (packets involving the IP address 10.2.3.3). The output will include source and destination IP addresses, source and destination MAC addresses, and other packet details. This is useful for monitoring or troubleshooting network traffic to or from the specified host.
 
-When you run this command, `tcpdump` will capture network packets on the `veth-meena-rtr` interface and display detailed information for each packet that matches the specified filter (packets involving the IP address 10.2.3.3). The output will include source and destination IP addresses, source and destination MAC addresses, and other packet details. This is useful for monitoring or troubleshooting network traffic to or from the specified host.
+Now we see that, 3 packets are captured, and 3 are received by the filter.
+[[../assets/image_1696766242406_0.png]]
+ 
 
+We see that the meena tries to send a ICMP echo request which originated from her machine(10.2.3.2) to raju's machine(10.2.3.3)
+Then we see a followup ARP request asking whoever has the ip address 10.2.3.3 please tell meena that you are the one.
+We see that the ARP request is received by both raju and meetu, but only raju responds with an ARP reply.
+The reply of the ARP request is the MAC address of the interface on raju's machine that is connected to the router.
+
+And then meena is also supposed to receive an ICMP echo reply packet. But it never receives so.
+* Debugging Firewall
+:PROPERTIES:
+:heading: 3
+:END:
+The first thing that should come to your mind, when packets are not being received is the cursed *FIREWALL*
+[[https://i.imgflip.com/81up6d.jpg]]
+
+You inspect all the firewall rules in your machine by running the command
+#+BEGIN_SRC shell
+sudo iptables --list --verbose --numeric
+#+END_SRC
+[[../assets/image_1696767902761_0.png]]
+
+By default, it has three chains, (INPUT, FORWARD, OUTPUT)*
+- Chain INPUT*: This chain is responsible for filtering packets that are destined for the local system (i.e., incoming packets). As the policy is set to ACCEPT, it means that all incoming packets are allowed unless there are specific rules that match and modify this behavior.*
+- Chain FORWARD*: This chain is responsible for filtering packets that are being forwarded through the system (i.e., packets that are not destined for the local system but are being routed through it). Again, the policy is set to ACCEPT, so all forwarding is allowed by default unless there are specific rules in place.*
+- Chain OUTPUT*: This chain is responsible for filtering packets generated by the local system and going out to other destinations (i.e., outgoing packets). Like the other chains, the policy is set to ACCEPT, so all outgoing packets are allowed by default.
+
+But if you execute the same command on the host machine, then, we will a lot of rules in the chains
+[[../assets/image_1696768246403_0.png]]
+
+And we also see that, the default forwarding rule is dropping packets if it doesn't match any rules.
+Now if you want to see the motion of which rule is stopping us from forwarding our packets, we observe the iptables
+#+BEGIN_SRC shell
+sudo watch --difference --interval 1 iptables --list FORWARD --verbose
+#+END_SRC
+[[../assets/ping-dropping_1696768685923_0.gif]]
+
+We see packets dropped by the firewall rule *DOCKER-ISOLATION-STAGE-1* and *DOCKER-USER*
+[[../assets/image_1696769381581_0.png]]
+
+These rules say, whatever the input or output interface, source or destination address, drop all the packets.
+
+So that's why our packets were not travelling.
+We can just disable the firewall and everything will work correctly.
+But we will not do so. Instead, we will add a rule to the top of the firewall table, that says, any thing going in or coming out of the interface *nfd-rtr* will be *ACCEPTED*.
+#+BEGIN_SRC shell
+sudo iptables --insert FORWARD --in-interface nfd-rtr --jump ACCEPT
+sudo iptables --insert FORWARD --out-interface nfd-rtr --jump ACCEPT
+#+END_SRC
+
+Here we add the rule that
+- ~sudo iptables --insert FORWARD --in-interface nfd-rtr --jump ACCEPT~: This command inserts a rule into the FORWARD chain that allows incoming traffic on the ~nfd-rtr~ network interface. In other words, it permits traffic coming into your system through the ~nfd-rtr~ interface to be forwarded.~
+- ~sudo iptables --insert FORWARD --out-interface nfd-rtr --jump ACCEPT~: This command inserts a rule into the FORWARD chain that allows outgoing traffic on the ~nfd-rtr~ network interface. It permits traffic leaving your system through the ~nfd-rtr~ interface to be forwarded.
+
+Since the rules are evaluated in order, we ask the firewall not to drop any packets for the interface ~nfd-rtr~, other packets will be evaluated as before.
+[[../assets/image_1696770111881_0.png]]
+
+Now if we ping from the machines, we will see all the pings, succeeded.
 *
