@@ -180,17 +180,20 @@ Now we will assign IP address 10.2.3.2 to meena and 10.2.3.3 to raju.
 ip addr add 10.2.3.2/24 dev veth-meena
 ip addr add 10.2.3.3/24 dev veth-raju
 #+END_SRC
-After that it will look something like this.
+After running these commands inside conainers' shell, it will look something like this.
 [[../assets/image_1695918847119_0.png]]
 
 Note that the state is still down.
 [[../assets/Screenshot_from_2023-09-30_09-09-07-mh_1696043574852_0.png]]
 
 We need to turn them UP.
+In the containers' interactive shell:
 #+BEGIN_SRC shell
 sudo ip link set dev veth-meena up
 sudo ip link set dev veth-raju up
 #+END_SRC
+_Note: While running these commands in the containers' interactive shell, some of you may face authentication related errors. In that case try running these commands without #+BEGIN_SRC shell sudo #+END_SRC._
+
 And then we can communicate with the computers in the network.
 #+BEGIN_SRC shell
 ping -c 2 10.2.3.3
@@ -269,12 +272,18 @@ sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-
 #+END_SRC
 
 And assign ip addresses to the interfaces.
+In the host terminal:
+#+BEGIN_SRC shell
+sudo ip addr add 10.2.3.1/24 dev nfd-rtr
+#+END_SRC
 
+In the containers' interactive shell
 #+BEGIN_SRC shell
 sudo ip addr add 10.2.3.2/24 dev veth-meena-rtr
 sudo ip addr add 10.2.3.3/24 dev veth-raju-rtr
 sudo ip addr add 10.2.3.4/24 dev veth-meetu-rtr
 #+END_SRC
+_Note: While running these commands in the containers' interactive shell, some of you may face authentication related errors. In that case try running these commands without #+BEGIN_SRC shell sudo #+END_SRC._
 
 And now, if we see the interfaces, it will look something like below.
 [[../assets/image_1696188956498_0.png]]
@@ -290,12 +299,16 @@ brctl show nfd-rtr
 [[../assets/image_1696190483136_0.png]]
 
 Now it's time to bring up all the connections.
+In the host terminal:
 #+BEGIN_SRC shell
 sudo ip link set nfd-rtr up
 sudo ip link set veth-rtr-meena up
 sudo ip link set veth-rtr-raju up
 sudo ip link set veth-rtr-meetu up
+#+END_SRC
 
+In containers' interactive shell:
+#+BEGIN_SRC shell
 ip link set veth-meena-rtr up
 ip link set veth-raju-rtr up
 ip link set veth-meetu-rtr up
