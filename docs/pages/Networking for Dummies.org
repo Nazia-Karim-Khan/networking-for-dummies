@@ -192,7 +192,8 @@ In the containers' interactive shell:
 sudo ip link set dev veth-meena up
 sudo ip link set dev veth-raju up
 #+END_SRC
-_Note: While running these commands in the containers' interactive shell, some of you may face authentication related errors. In that case try running these commands without #+BEGIN_SRC shell sudo #+END_SRC._
+/Note: While running these commands in the containers’ interactive shell, some of you may face authentication related errors. In that case try running these commands without sudo./
+
 
 And then we can communicate with the computers in the network.
 #+BEGIN_SRC shell
@@ -283,7 +284,7 @@ sudo ip addr add 10.2.3.2/24 dev veth-meena-rtr
 sudo ip addr add 10.2.3.3/24 dev veth-raju-rtr
 sudo ip addr add 10.2.3.4/24 dev veth-meetu-rtr
 #+END_SRC
-_Note: While running these commands in the containers' interactive shell, some of you may face authentication related errors. In that case try running these commands without #+BEGIN_SRC shell sudo #+END_SRC._
+/Note: While running these commands in the containers’ interactive shell, some of you may face authentication related errors. In that case try running these commands without sudo./
 
 And now, if we see the interfaces, it will look something like below.
 [[../assets/image_1696188956498_0.png]]
