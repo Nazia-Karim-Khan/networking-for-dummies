@@ -273,12 +273,13 @@ sudo ip link set netns $(docker container inspect --format '{{.State.Pid}}' nfd-
 #+END_SRC
 
 And assign ip addresses to the interfaces.
+
 In the host terminal:
 #+BEGIN_SRC shell
 sudo ip addr add 10.2.3.1/24 dev nfd-rtr
 #+END_SRC
 
-In the containers' interactive shell
+In the containers' interactive shell:
 #+BEGIN_SRC shell
 sudo ip addr add 10.2.3.2/24 dev veth-meena-rtr
 sudo ip addr add 10.2.3.3/24 dev veth-raju-rtr
@@ -300,6 +301,7 @@ brctl show nfd-rtr
 [[../assets/image_1696190483136_0.png]]
 
 Now it's time to bring up all the connections.
+
 In the host terminal:
 #+BEGIN_SRC shell
 sudo ip link set nfd-rtr up
